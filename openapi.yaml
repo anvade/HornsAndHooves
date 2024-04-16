@@ -1,0 +1,416 @@
+openapi: 3.0.0
+info: 
+  title: магазин Рога и Копыта OpenAPI спецификация
+  version: 0.0.1
+servers: 
+  - url: http://localhost:8000/
+paths: 
+  /product:
+    get:
+      summary: Метод получения товара
+      parameters:
+        - name: id
+          in: query
+          required: True
+          description: Идентивикатор товара
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: product not found
+  /products:
+    post:
+      summary: Метод получения товаров по категории
+      requestBody:
+        required: True
+        content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  name: Корм для собак
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Products"
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: category not found
+                  
+  /cart:
+    get:
+      summary: Метод получения корзины
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartGet"
+        '403':
+          description: Не авторизованный пользователь
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: Authentication credentials were not provided
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: product not found
+                  
+    post:
+      summary: Метод добавления товара в корзину
+      requestBody:
+        required: True
+        content:
+            application/json:
+              schema:
+                type: integer
+                example:
+                  id: 4
+                  amount: 4
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        '403':
+          description: Не авторизованный пользователь
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: Authentication credentials were not provided
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: product not found in card
+    
+    put:
+      summary: Метод изменения количества товара в корзине
+      requestBody:
+        required: True
+        content:
+            application/json:
+              schema:
+                type: integer
+                example:
+                  id: 2
+                  amount: 4
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        '403':
+          description: Не авторизованный пользователь
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: Authentication credentials were not provided
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: product not found in card
+    delete:
+      summary: Метод удаления товара из корзины
+      parameters:
+        - name: id
+          in: query
+          required: True
+          description: Идентивикатор товара
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: deleted successfully
+        '403':
+          description: Не авторизованный пользователь
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: Authentication credentials were not provided
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: product not found in card
+  /order:
+    post:
+      summary: Метод получения товаров по категории
+      requestBody:
+        required: True
+        content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  name: Корм для собак
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        '403':
+          description: Не авторизованный пользователь
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: Authentication credentials were not provided
+        'default':
+          description: Всё нестандартное
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  detail: cart is empty
+
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: Бобик
+        description:
+          type: string
+          example: здоровое питание для твоей собаки
+        category_id:
+          type: array
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/Category"
+              - $ref: "#/components/schemas/CategoryTwo"
+        price:
+          type: integer
+          example: 112
+    
+    ProductTwo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 4
+        name:
+          type: string
+          example: Жучка
+        description:
+          type: string
+          example: Не очень здоровое питание для твоей собаки
+        category_id:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        price:
+          type: integer
+          example: 56
+  
+    Category:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 4
+        name: 
+          type: string
+          example: Корм для собак
+    CategoryTwo:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 5
+        name: 
+          type: string
+          example: Полезно для здоровья
+            
+    Products:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/Product"
+            - $ref: "#/components/schemas/ProductTwo"
+    
+    ProductCart:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        card_id:
+          type: string
+          example: 1 user card
+        product_id:
+          $ref: "#/components/schemas/Product"
+        amount: 
+          type: integer
+          example: 1
+          
+    ProductCartTwo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        card_id:
+          type: string
+          example: 1 user card
+        product_id:
+          $ref: "#/components/schemas/ProductTwo"
+        amount: 
+          type: integer
+          example: 4
+    
+    CartGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: object
+          example: 
+            id: 1
+        product_cart_id:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/ProductCart"
+    
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: object
+          example: 
+            id: 1
+        product_cart_id:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/ProductCart"
+            - $ref: "#/components/schemas/ProductCartTwo"
+
+    ProductOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        order_id:
+          type: string
+          example: 1 user order
+        product_id:
+          $ref: "#/components/schemas/Product"
+        amount: 
+          type: integer
+          example: 1
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: object
+          example: 
+            id: 1
+        product_order_id:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/ProductOrder"
+        status:
+          type: string
+          example: IP
+
+              
+        
+        
+              
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+              
